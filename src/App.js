@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { init as firebaseInit } from './firebase'
 import { BrowserRouter } from 'react-router-dom'
-import { Router } from './Routes';
+import { Routes } from './Routes';
 
 export default class App extends Component {
   constructor(props) {
@@ -13,7 +13,7 @@ export default class App extends Component {
     return (
       <div className="App">
         <BrowserRouter>
-          <Router />
+          <Routes />
         </BrowserRouter>
       </div>
     );
