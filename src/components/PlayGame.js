@@ -5,6 +5,14 @@ import { Slider } from "./Slider";
 export class PlayGame extends Component {
     state = {
         inputs: {},
+        results: {
+            revenue: 0,
+            cog: 0,
+            grossProfit: 0,
+            expenses: 0,
+            netProfit: 0,
+            ror: 0
+        },
         isLoadingFinished: false,
         isSaved: true,
         isUserReady: false,
@@ -69,9 +77,27 @@ export class PlayGame extends Component {
         })
     }
 
+    getRevenue = () => {
+        if (!this.state.isLoadingFinished) return
+        const results = {...this.state.results}
+        results.revenue = this.state.inputs.price.value * this.state.inputs.sales.value
+
+        this.setState({
+            results: results
+        })
+    }
+
+    getCoGs = () => {
+        if (!this.state.isLoadingFinished) return
+        return (
+            (this.state.inputs.price.value * this.state.inputs.sales.value).toLocaleString()
+        )
+    }
+
     render() {
 
         let Controls = 'Loading...'
+        let Results = null
 
         if (this.state.isLoadingFinished) {
 
@@ -93,8 +119,19 @@ export class PlayGame extends Component {
                     />
                 )
             })
-        }
 
+            Results = () => (
+                <section>
+                    <div>Target Revenue:<span>$</span></div>
+                    <div>Cost of Goods:<span>$</span></div>
+                    <div>Gross Profit:<span> $</span></div>
+                    <div>Expenses:<span> $</span></div>
+                    <div>Net Profit:<span> $</span></div>
+                    <div>Return on Revenue:<span> %</span></div>
+                </section>
+            )
+        }
+        
         return (
             <div className = 'PlayGame'> 
                 <h1>Venture Co - header</h1>
@@ -111,8 +148,8 @@ export class PlayGame extends Component {
                     >I'm ready
                     </button>
                 </nav>
-
-                {Controls}
+                {Results}
+                <section>{Controls}</section>
             </div>
         )
     }

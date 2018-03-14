@@ -18,6 +18,9 @@
 .Slider .value {
     text-align: end;
 }
+.Slider .value span:first-child{
+    margin-right:.3rem;
+}
 
 .Slider input[type='range'] {
     -webkit-appearance: none;
