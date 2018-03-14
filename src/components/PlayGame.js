@@ -5,7 +5,9 @@ import { Slider } from "./Slider";
 export class PlayGame extends Component {
     state = {
         inputs: {},
-        isReady: false,
+        isLoadingFinished: false,
+        isSaved: true,
+        isUserReady: false,
         error: {
             state: false,
             msg: ''
@@ -17,7 +19,7 @@ export class PlayGame extends Component {
             .then(res => {
                 this.setState({
                     inputs: res.data,
-                    isReady: true
+                    isLoadingFinished: true
                 })
             })
             .catch(err => {
@@ -33,9 +35,37 @@ export class PlayGame extends Component {
     handleChange = ( event ) => {
         const name = event.target.name
         const updatedInputs = {...this.state.inputs}
-        updatedInputs[name].value = event.target.value
+        updatedInputs[name].value = Number(event.target.value)
+
         this.setState({
-             inputs: updatedInputs
+             inputs: updatedInputs,
+             isSaved: false
+        })
+    }
+
+    saveInputs = () => {
+        const inputs = {...this.state.inputs}
+
+        axios.put('https://venture-co.firebaseio.com/inputs.json', inputs)
+        .then(res => {
+            this.setState({
+                isSaved: true
+           })
+           alert('Decision saved!')
+        })
+        .catch(err => {
+            this.setState({
+                error: {
+                    state: true,
+                    msg: err
+                }
+            })
+        })
+    }
+
+    toggleUserReady = () => {
+        this.setState({
+            isUserReady: !this.state.isUserReady
         })
     }
 
@@ -43,19 +73,18 @@ export class PlayGame extends Component {
 
         let Controls = 'Loading...'
 
-        if (this.state.isReady) {
+        if (this.state.isLoadingFinished) {
 
             Controls = Object.keys(this.state.inputs).map(key => {
 
-                const inputName = key
-                const input = this.state.inputs[inputName]
+                const input = {...this.state.inputs[key]}
 
                 return (
                     <Slider
                         type = { input.type }
-                        name = { inputName }
+                        name = { key }
                         unit = { input.unit }
-                        key = { inputName }
+                        key = { key }
                         min = { input.min }
                         max = { input.max }
                         step = { input.step }
@@ -68,7 +97,21 @@ export class PlayGame extends Component {
 
         return (
             <div className = 'PlayGame'> 
-                <h1>Play game</h1>
+                <h1>Venture Co - header</h1>
+
+                <nav>
+                    <button
+                        onClick = { this.saveInputs }
+                        className = { this.state.isSaved ? 'saved' : null }
+                    >Save
+                    </button>
+                    <button
+                        onClick = { this.toggleUserReady }
+                        className = { this.state.isUserReady ? 'ready' : null }
+                    >I'm ready
+                    </button>
+                </nav>
+
                 {Controls}
             </div>
         )
