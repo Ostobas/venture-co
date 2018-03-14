@@ -1,0 +1,42 @@
+.Slider {
+    width: 100%;
+    max-width: 320px;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 1rem auto 2rem;
+}
+
+.Slider .name,
+.Slider .value {
+    flex-basis: 50%;
+}
+
+.Slider .name {
+    text-transform: capitalize;
+}
+
+.Slider .value {
+    text-align: end;
+}
+
+.Slider input[type='range'] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 25px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: .8;
+    transition: opacity .2s;
+}
+
+.Slider input[type='range']:hover {
+    opacity: 1;
+}
+
+.Slider input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 25px;
+    height: 25px;
+    background: var(--green);
+    cursor: pointer;
+}
