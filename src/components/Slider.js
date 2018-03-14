@@ -6,7 +6,7 @@ export const Slider = props => {
 
     return (
         <div className = 'Slider'>
-        <div className = 'name'>{ props.name }</div>
+        <div className = 'name'>{ props.realName }</div>
         <div className = 'value'>
             <span>{Number( props.value ).toLocaleString()}</span>
             <span>{ props.unit }</span>

@@ -17,13 +17,13 @@ export class PlayGame extends Component {
     }
 
     componentDidMount () {
-        axios.get('https://venture-co.firebaseio.com/')
+        axios.get('https://venture-co.firebaseio.com/game.json')
             .then(res => {
-                console.log(res.data)
-                this.setState({
-                    inputs: res.data,
-                    isLoadingFinished: true
-                })
+                const stateObj = {...this.state}
+                stateObj.inputs = res.data.inputs
+                stateObj.setup = res.data.setup
+                stateObj.isLoadingFinished = true
+                this.setState(stateObj)
             })
             .catch(err => {
                 this.setState({
@@ -38,7 +38,7 @@ export class PlayGame extends Component {
     handleChange = ( event ) => {
         const name = event.target.name
         const updatedInputs = {...this.state.inputs}
-        updatedInputs[name].value = Number(event.target.value)
+        updatedInputs[name] = Number(event.target.value)
 
         this.setState({
              inputs: updatedInputs,
@@ -49,7 +49,7 @@ export class PlayGame extends Component {
     saveInputs = () => {
         const inputs = {...this.state.inputs}
 
-        axios.put('https://venture-co.firebaseio.com/inputs.json', inputs)
+        axios.put('https://venture-co.firebaseio.com/game/inputs.json', inputs)
         .then(res => {
             this.setState({
                 isSaved: true
@@ -78,20 +78,21 @@ export class PlayGame extends Component {
 
         if (this.state.isLoadingFinished) {
 
-            Controls = Object.keys(this.state.inputs).map(key => {
+            Controls = Object.keys(this.state.setup.inputs).map(key => {
 
-                const input = {...this.state.inputs[key]}
+                const inputSetup = {...this.state.setup.inputs[key]}
 
                 return (
                     <Slider
-                        type = { input.type }
-                        name = { key }
-                        unit = { input.unit }
                         key = { key }
-                        min = { input.min }
-                        max = { input.max }
-                        step = { input.step }
-                        value = { input.value }
+                        type = { inputSetup.type }
+                        name = { key }
+                        realName = { inputSetup.name }
+                        unit = { inputSetup.unit }
+                        min = { inputSetup.min }
+                        max = { inputSetup.max }
+                        step = { inputSetup.step }
+                        value = { this.state.inputs[key] }
                         change = { this.handleChange }
                     />
                 )
@@ -116,7 +117,7 @@ export class PlayGame extends Component {
                 </nav>
 
                 {this.state.isLoadingFinished ? 
-                    <Results inputs = {this.state.inputs}/> 
+                    <Results inputs = {this.state.inputs} setup = { this.state.setup } /> 
                     : null 
                 }
                 <section>{Controls}</section>

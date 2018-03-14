@@ -2,10 +2,10 @@ import React from 'react'
 
 export const Results = props => {
 
-    const price = props.inputs.price.value
-    const promotion = props.inputs.promotion.value
-    const quality = props.inputs.quality.value
-    const sales = props.inputs.sales.value
+    const price = props.inputs.price
+    const promotion = props.inputs.promotion
+    const quality = props.inputs.quality
+    const sales = props.inputs.sales
 
     const getRevenue = () => ( price * sales )
 
