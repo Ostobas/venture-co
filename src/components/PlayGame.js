@@ -2,12 +2,13 @@ import React, { Component } from "react";
 import axios from 'axios'
 import { Slider } from "./Slider";
 import { Results } from "./Results";
-import { Button, Container, Loader, Dimmer, Header, Icon } from 'semantic-ui-react'
+import { Button, Container, Loader, Dimmer, Header, Icon, Dropdown, Divider, Menu } from 'semantic-ui-react'
 
 export class PlayGame extends Component {
     state = {
         inputs: {},
         setup: {},
+        gameTime: 10,
         isLoadingFinished: false,
         isSaved: true,
         isUserReady: false,
@@ -34,6 +35,25 @@ export class PlayGame extends Component {
                     }
                 })
             })
+        
+            this.timer = setInterval(this.tick, 1000)
+    }
+
+    tick = () => {
+        const oldTime = this.state.gameTime
+        if (oldTime <= 0) {
+            clearInterval(this.timer)
+            return
+        }
+        this.setState({
+            gameTime: oldTime - 1
+        })
+    }
+
+    secondsToMinutes = (time) => {
+        const minutes = Math.floor( time / 60 )
+        const seconds = time % 60
+        return minutes + ':' + seconds
     }
 
     handleChange = ( event ) => {
@@ -101,12 +121,43 @@ export class PlayGame extends Component {
                 )
             })        
         }
+
+        const friendOptions = [
+            {
+                text: 'Target Year',
+                value: 'target'
+            },
+            {
+                text: 'Last Year',
+                value: 'last'
+            },
+            {
+                text: 'History',
+                value: 'history'
+            },
+            {
+                text: 'Market Info',
+                value: 'market'
+            }
+                
+        ]
         
         return (
             <div className = 'PlayGame'> 
-                <Container>
-                    <Header as = 'h3' content = 'Venture Co' />
 
+                <Menu inverted>
+                    <Menu.Item header>Venture Co</Menu.Item>
+                </Menu>
+
+                <Container>
+
+                    <Header as = 'h3' content = '' />
+
+                    <div className = 'spacer'>
+                        <Header as = 'h2' content = 'P&L' />
+                        <Dropdown inline options={friendOptions} defaultValue={friendOptions[0].value} />
+                    </div>
+                    
                     {this.state.isLoadingFinished ? 
                         <Results
                             inputs = {this.state.inputs}
@@ -114,26 +165,33 @@ export class PlayGame extends Component {
                         /> 
                         : null 
                     }
+                    
+                    <Divider />
 
                     <Header as = 'h2' content = 'Make your moves!' />
                     {Controls}
 
-                    <div className = 'spacer'>
-                        <Button
-                        color = { this.state.isUserReady ? 'green' : 'blue' }
-                            onClick = { this.toggleUserReady }
-                            className = { this.state.isUserReady ? 'ready' : null }
-                        >
-                        { this.state.isUserReady ? 'Nice' : "I'm ready" }
-                        </Button>
-                        <Button
-                            color = { this.state.isSaved ? 'green' : 'blue' }
-                            onClick = { this.saveInputs }
-                            className = { this.state.isSaved ? 'saved' : null }
-                        >
-                        <Icon name='save' />
-                        { this.state.isSaved ? 'Saved' : 'Save' }
-                        </Button>
+                    <div className = 'fixed-bottom'>
+                        <div className = 'spacer'>
+                            <Button
+                                color = { this.state.isUserReady ? 'green' : 'blue' }
+                                onClick = { this.toggleUserReady }
+                                className = { this.state.isUserReady ? 'ready' : null }
+                            >
+                            { this.state.isUserReady ? 'Nicely done!' : "I'm ready" }
+                            </Button>
+                            <span><strong>
+                                { this.state.gameTime === 0 ? "Time's up!" : this.secondsToMinutes(this.state.gameTime) }
+                            </strong></span>
+                            <Button
+                                color = { this.state.isSaved ? 'green' : 'blue' }
+                                onClick = { this.saveInputs }
+                                className = { this.state.isSaved ? 'saved' : null }
+                            >
+                            <Icon name = 'save' />
+                            { this.state.isSaved ? 'Saved' : 'Save' }
+                            </Button>
+                        </div>
                     </div>
 
                 </Container>

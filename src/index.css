@@ -1,24 +1,29 @@
-:root{
-  --green:#588C7E;
-  --blue:#2185d0;
-  --yellow:#F2E394;
-  --orange:#F2AE72;
-  --red:#D96459;
-  --brown:#8C4646;
-
-  --primary: var(--green);
-  --secondary: var(--orange);
-  --bg:#fff;
-  --text: #3a3a3a;
-}
-
 .spacer {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
 }
 
 .summer {
   font-weight: 700;
     border-bottom: 1px solid;
     margin-bottom: .4rem;
+}
+
+.fixed-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1em;
+  border-top: 1px solid rgba(34,36,38,.15);
+}
+
+.ui.dropdown .menu {
+  left: inherit;
+  right: 0;
+}
+
+.ui.menu {
+  border-radius: 0;
 }

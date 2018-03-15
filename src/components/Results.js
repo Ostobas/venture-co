@@ -1,5 +1,4 @@
 import React from 'react'
-import { Header } from 'semantic-ui-react';
 
 export const Results = props => {
 
@@ -24,8 +23,7 @@ export const Results = props => {
     }
 
     return (
-    <section classname = 'Results'>
-        <Header as = 'h2' content = 'P&L'/>
+    <section className = 'Results'>
         <div className = 'spacer'>Total Revenue:
             <span>{ getRevenue().toLocaleString() } $</span>
         </div>

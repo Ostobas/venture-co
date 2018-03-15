@@ -39,6 +39,6 @@
     -webkit-appearance: none;
     width: 25px;
     height: 25px;
-    background: var(--green);
+    background: #1b1c1d;
     cursor: pointer;
 }
