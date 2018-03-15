@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import axios from 'axios'
 import { Slider } from "./Slider";
 import { Results } from "./Results";
+import { Button, Container, Loader, Dimmer, Header, Icon } from 'semantic-ui-react'
 
 export class PlayGame extends Component {
     state = {
@@ -54,7 +55,6 @@ export class PlayGame extends Component {
             this.setState({
                 isSaved: true
            })
-           alert('Decision saved!')
         })
         .catch(err => {
             this.setState({
@@ -74,7 +74,10 @@ export class PlayGame extends Component {
 
     render() {
 
-        let Controls = 'Loading...'
+        let Controls = 
+            <Dimmer active inverted>
+                <Loader content = 'Loading' size = 'huge'/>
+            </Dimmer>
 
         if (this.state.isLoadingFinished) {
 
@@ -101,26 +104,39 @@ export class PlayGame extends Component {
         
         return (
             <div className = 'PlayGame'> 
-                <h1>Venture Co - header</h1>
+                <Container>
+                    <Header as = 'h3' content = 'Venture Co' />
 
-                <nav>
-                    <button
-                        onClick = { this.saveInputs }
-                        className = { this.state.isSaved ? 'saved' : null }
-                    >Save
-                    </button>
-                    <button
-                        onClick = { this.toggleUserReady }
-                        className = { this.state.isUserReady ? 'ready' : null }
-                    >I'm ready
-                    </button>
-                </nav>
+                    {this.state.isLoadingFinished ? 
+                        <Results
+                            inputs = {this.state.inputs}
+                            setup = { this.state.setup }
+                        /> 
+                        : null 
+                    }
 
-                {this.state.isLoadingFinished ? 
-                    <Results inputs = {this.state.inputs} setup = { this.state.setup } /> 
-                    : null 
-                }
-                <section>{Controls}</section>
+                    <Header as = 'h2' content = 'Make your moves!' />
+                    {Controls}
+
+                    <div className = 'spacer'>
+                        <Button
+                        color = { this.state.isUserReady ? 'green' : 'blue' }
+                            onClick = { this.toggleUserReady }
+                            className = { this.state.isUserReady ? 'ready' : null }
+                        >
+                        { this.state.isUserReady ? 'Nice' : "I'm ready" }
+                        </Button>
+                        <Button
+                            color = { this.state.isSaved ? 'green' : 'blue' }
+                            onClick = { this.saveInputs }
+                            className = { this.state.isSaved ? 'saved' : null }
+                        >
+                        <Icon name='save' />
+                        { this.state.isSaved ? 'Saved' : 'Save' }
+                        </Button>
+                    </div>
+
+                </Container>
             </div>
         )
     }

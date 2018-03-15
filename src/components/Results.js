@@ -1,4 +1,5 @@
 import React from 'react'
+import { Header } from 'semantic-ui-react';
 
 export const Results = props => {
 
@@ -9,13 +10,13 @@ export const Results = props => {
 
     const getRevenue = () => ( price * sales )
 
-    const getCoGs = () => ( quality / 100 * 250 * sales )
+    const getCoGs = () => -( quality / 100 * 250 * sales )
 
-    const getGrossProfit = () => ( getRevenue() - getCoGs() )
+    const getGrossProfit = () => ( getRevenue() + getCoGs() )
 
-    const getExpenses = () => ( promotion + 800000 )
+    const getExpenses = () => -( promotion + 800000 )
 
-    const getNetprofit = () => ( getGrossProfit() - getExpenses() )
+    const getNetprofit = () => ( getGrossProfit() + getExpenses() )
 
     const getRoR = () => {
         if (!getNetprofit() || !getRevenue()) return 0
@@ -23,23 +24,24 @@ export const Results = props => {
     }
 
     return (
-    <section>
-        <div>Target Revenue:
+    <section classname = 'Results'>
+        <Header as = 'h2' content = 'P&L'/>
+        <div className = 'spacer'>Total Revenue:
             <span>{ getRevenue().toLocaleString() } $</span>
         </div>
-        <div>Cost of Goods:
+        <div  className = 'spacer'>Cost of Goods:
             <span>{ getCoGs().toLocaleString() } $</span>
         </div>
-        <div>Gross Profit:
+        <div  className = 'spacer summer'>Gross Profit:
             <span>{ getGrossProfit().toLocaleString() } $</span>
         </div>
-        <div>Expenses:
+        <div className = 'spacer'>Expenses:
             <span>{ getExpenses().toLocaleString() } $</span>
         </div>
-        <div>Net Profit:
+        <div className = 'spacer summer'>Net Profit:
             <span>{ getNetprofit().toLocaleString() } $</span>
         </div>
-        <div>Return on Revenue:
+        <div className = 'spacer'>Return on Revenue:
             <span>{ getRoR().toFixed(2) } %</span>
         </div>
     </section>
