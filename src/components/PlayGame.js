@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import axios from 'axios'
+import { instance as axios } from '../axios'
 import { Slider } from "./Slider";
 import { Results } from "./Results";
 import { Button, Container, Loader, Dimmer, Header, Icon, Dropdown, Divider, Menu } from 'semantic-ui-react'
@@ -19,7 +19,7 @@ export class PlayGame extends Component {
     }
 
     componentDidMount () {
-        axios.get('https://venture-co.firebaseio.com/game.json')
+        axios.get('game.json')
             .then(res => {
                 const stateObj = {...this.state}
                 stateObj.inputs = res.data.inputs
@@ -70,7 +70,7 @@ export class PlayGame extends Component {
     saveInputs = () => {
         const inputs = {...this.state.inputs}
 
-        axios.put('https://venture-co.firebaseio.com/game/inputs.json', inputs)
+        axios.put('game/inputs.json', inputs)
         .then(res => {
             this.setState({
                 isSaved: true
