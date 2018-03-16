@@ -10,10 +10,6 @@
     flex-basis: 50%;
 }
 
-.Slider .name {
-    text-transform: capitalize;
-}
-
 .Slider .value {
     text-align: end;
 }

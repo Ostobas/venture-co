@@ -11,6 +11,7 @@ export class PlayGame extends Component {
         gameTime: 10,
         isLoadingFinished: false,
         isSaved: true,
+        isCurrentlySaving: false,
         isUserReady: false,
         error: {
             state: false,
@@ -68,12 +69,17 @@ export class PlayGame extends Component {
     }
 
     saveInputs = () => {
+        this.setState({
+            isCurrentlySaving: true
+        })
+
         const inputs = {...this.state.inputs}
 
         axios.put('game/inputs.json', inputs)
         .then(res => {
             this.setState({
-                isSaved: true
+                isSaved: true,
+                isCurrentlySaving: false
            })
         })
         .catch(err => {
@@ -110,7 +116,7 @@ export class PlayGame extends Component {
                         key = { key }
                         type = { inputSetup.type }
                         name = { key }
-                        realName = { inputSetup.name }
+                        realName = { inputSetup.realname }
                         unit = { inputSetup.unit }
                         min = { inputSetup.min }
                         max = { inputSetup.max }
@@ -151,8 +157,6 @@ export class PlayGame extends Component {
 
                 <Container>
 
-                    <Header as = 'h3' content = '' />
-
                     <div className = 'spacer'>
                         <Header as = 'h2' content = 'P&L' />
                         <Dropdown inline options={friendOptions} defaultValue={friendOptions[0].value} />
@@ -181,9 +185,13 @@ export class PlayGame extends Component {
                             { this.state.isUserReady ? 'Nicely done!' : "I'm ready" }
                             </Button>
                             <span><strong>
-                                { this.state.gameTime === 0 ? "Time's up!" : this.secondsToMinutes(this.state.gameTime) }
+                                { this.state.gameTime === 0 ? 
+                                    "Time's up!" : 
+                                    this.secondsToMinutes(this.state.gameTime) 
+                                }
                             </strong></span>
                             <Button
+                                loading = {this.state.isCurrentlySaving}
                                 color = { this.state.isSaved ? 'green' : 'blue' }
                                 onClick = { this.saveInputs }
                                 className = { this.state.isSaved ? 'saved' : null }

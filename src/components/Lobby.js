@@ -8,6 +8,6 @@ export const Lobby = () => (
 
     <div className = 'Lobby'> 
         <Link className='Link' to = '/create'>Create New</Link>
-        <Link className='Link' to = '/join'>Join</Link>
+        {/* <Link className='Link' to = '/join'>Join</Link> */}
     </div>
 )
