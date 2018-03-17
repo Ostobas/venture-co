@@ -8,7 +8,6 @@ export class PlayGame extends Component {
     state = {
         inputs: {},
         setup: {},
-        gameTime: 10,
         isLoadingFinished: false,
         isSaved: true,
         isCurrentlySaving: false,
@@ -20,10 +19,12 @@ export class PlayGame extends Component {
     }
 
     componentDidMount () {
-        axios.get('game.json')
+        const gameID = localStorage.getItem('gameID')
+        const uri = 'games/' + gameID + '.json'
+        axios.get(uri)
             .then(res => {
                 const stateObj = {...this.state}
-                stateObj.inputs = res.data.inputs
+                stateObj.inputs = res.data.inputs[0]
                 stateObj.setup = res.data.setup
                 stateObj.isLoadingFinished = true
                 this.setState(stateObj)
@@ -41,13 +42,15 @@ export class PlayGame extends Component {
     }
 
     tick = () => {
-        const oldTime = this.state.gameTime
+        const oldTime = this.state.setup.roundTime
         if (oldTime <= 0) {
             clearInterval(this.timer)
             return
         }
+        const setup = {...this.state.setup}
+        setup.roundTime -= 1
         this.setState({
-            gameTime: oldTime - 1
+            setup: setup
         })
     }
 
@@ -75,7 +78,11 @@ export class PlayGame extends Component {
 
         const inputs = {...this.state.inputs}
 
-        axios.put('game/inputs.json', inputs)
+        const gameID = localStorage.getItem('gameID')
+        const period = 0
+        const uri = 'games/' + gameID + '/inputs/' + period + '.json'
+
+        axios.put(uri, inputs)
         .then(res => {
             this.setState({
                 isSaved: true,
@@ -185,9 +192,9 @@ export class PlayGame extends Component {
                             { this.state.isUserReady ? 'Nicely done!' : "I'm ready" }
                             </Button>
                             <span><strong>
-                                { this.state.gameTime === 0 ? 
+                                { this.state.setup.roundTime === 0 ? 
                                     "Time's up!" : 
-                                    this.secondsToMinutes(this.state.gameTime) 
+                                    this.secondsToMinutes(this.state.setup.roundTime) 
                                 }
                             </strong></span>
                             <Button

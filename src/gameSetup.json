@@ -1,9 +1,9 @@
 {
     "defaultInputs" : {
-      "price" : 80,
+      "price" : 94,
       "promotion" : 215000,
-      "quality" : 25,
-      "sales" : 18200
+      "quality" : 16,
+      "sales" : 20300
     },
     "setup" : {
       "inputs" : {

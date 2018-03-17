@@ -31,23 +31,24 @@ export class CreateGame extends Component {
         if (!this.validateUsername())  return
 
         const gameObj = gameSetup
-        gameObj.setup.rounds = this.state.rounds
-        gameObj.setup.roundTime = this.state.roundTime
-        gameObj.setup.teams = this.state.teams
+        gameObj.setup.roundsTotal = this.state.rounds
+        gameObj.setup.roundTime = this.state.roundTime * 60
+        gameObj.setup.teamsTotal = this.state.teams
         gameObj.createdBy = this.state.userName
         gameObj.createdInTime = new Date()
         gameObj.code = this.generateCode(6)
 
         gameObj.setup.demands = []
         gameObj.inputs = []
-        for ( let i = 0; i <= gameObj.setup.rounds; i++ ) {
-            gameObj.setup.demands.push( gameObj.setup.baseDemand *  gameObj.setup.teams )
+        for ( let i = 0; i <= gameObj.setup.roundsTotal; i++ ) {
+            gameObj.setup.demands.push( gameObj.setup.baseDemand *  gameObj.setup.teamsTotal )
             gameObj.inputs.push( gameObj.defaultInputs )
         }
 
         axios.post('games.json', gameObj)
         .then(res => {
-            // console.log(res.data.name)
+            const gameID = res.data.name
+            localStorage.setItem('gameID', gameID)
             this.props.history.push('/play/' + gameObj.code)
         })
         .catch(err => {

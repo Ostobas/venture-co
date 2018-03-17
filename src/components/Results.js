@@ -24,22 +24,22 @@ export const Results = props => {
 
     return (
     <section className = 'Results'>
-        <div className = 'spacer'>Total Revenue:
+        <div className = 'spacer'>Total Revenue
             <span>{ getRevenue().toLocaleString() } $</span>
         </div>
-        <div  className = 'spacer'>Cost of Goods:
+        <div  className = 'spacer'>Cost of Goods
             <span>{ getCoGs().toLocaleString() } $</span>
         </div>
-        <div  className = 'spacer summer'>Gross Profit:
+        <div  className = 'spacer summer'>Gross Profit
             <span>{ getGrossProfit().toLocaleString() } $</span>
         </div>
-        <div className = 'spacer'>Expenses:
+        <div className = 'spacer'>Expenses
             <span>{ getExpenses().toLocaleString() } $</span>
         </div>
         <div className = 'spacer summer'>Net Profit:
             <span>{ getNetprofit().toLocaleString() } $</span>
         </div>
-        <div className = 'spacer'>Return on Revenue:
+        <div className = 'spacer'>Return on Revenue
             <span>{ getRoR().toFixed(2) } %</span>
         </div>
     </section>
