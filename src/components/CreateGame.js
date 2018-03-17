@@ -106,7 +106,7 @@ export class CreateGame extends Component {
                     />
 
                     <Message negative hidden = { this.state.isValidUsername } >
-                        <Message.Header>Invalid uername!</Message.Header>
+                        <Message.Header>Invalid username!</Message.Header>
                         <p>Username must be a minimum of 3 and a maximum of 10 characters.</p>
                     </Message>
 

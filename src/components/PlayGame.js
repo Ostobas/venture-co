@@ -105,6 +105,10 @@ export class PlayGame extends Component {
         })
     }
 
+    handleDismiss = () => {
+        return true
+    }
+
     render() {
 
         let Controls = 
@@ -139,10 +143,6 @@ export class PlayGame extends Component {
             {
                 text: 'Target Year',
                 value: 'target'
-            },
-            {
-                text: 'Last Year',
-                value: 'last'
             },
             {
                 text: 'History',

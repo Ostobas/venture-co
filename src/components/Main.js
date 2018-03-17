@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom'
-import './Lobby.css'
+import './Main.css'
 
-export const Lobby = () => (
+export const Main = () => (
 
 
 
-    <div className = 'Lobby'> 
-        <Link className='Link' to = '/create'>Create New</Link>
+    <div className = 'Main'> 
+        <Link className='Link' to = '/create'>New game</Link>
         {/* <Link className='Link' to = '/join'>Join</Link> */}
     </div>
 )
