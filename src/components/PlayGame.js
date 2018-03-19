@@ -12,6 +12,7 @@ export class PlayGame extends Component {
         isSaved: true,
         isCurrentlySaving: false,
         isUserReady: false,
+        timeRemaining: 60,
         error: {
             state: false,
             msg: ''
@@ -19,15 +20,23 @@ export class PlayGame extends Component {
     }
 
     componentDidMount () {
+        const period = 0
         const gameID = localStorage.getItem('gameID')
         const uri = 'games/' + gameID + '.json'
         axios.get(uri)
             .then(res => {
                 const stateObj = {...this.state}
-                stateObj.inputs = res.data.inputs[0]
+                stateObj.inputs = res.data.inputs[period]
                 stateObj.setup = res.data.setup
+
+                const now = new Date().getTime()
+                const passedTime = Math.round((now - Date.parse(res.data.createdInTime)) / 1000)
+                stateObj.timeRemaining = Math.max(res.data.setup.roundTime - passedTime, 0)
+                
                 stateObj.isLoadingFinished = true
                 this.setState(stateObj)
+
+                this.timer = setInterval(this.tick, 1000)
             })
             .catch(err => {
                 this.setState({
@@ -36,21 +45,18 @@ export class PlayGame extends Component {
                         msg: err
                     }
                 })
-            })
-        
-            this.timer = setInterval(this.tick, 1000)
+            })    
     }
 
     tick = () => {
-        const oldTime = this.state.setup.roundTime
+        let oldTime = this.state.timeRemaining
         if (oldTime <= 0) {
             clearInterval(this.timer)
             return
         }
-        const setup = {...this.state.setup}
-        setup.roundTime -= 1
+        oldTime -= 1
         this.setState({
-            setup: setup
+            timeRemaining: oldTime
         })
     }
 
@@ -192,9 +198,9 @@ export class PlayGame extends Component {
                             { this.state.isUserReady ? 'Nicely done!' : "I'm ready" }
                             </Button>
                             <span><strong>
-                                { this.state.setup.roundTime === 0 ? 
+                                { this.state.timeRemaining === 0 ? 
                                     "Time's up!" : 
-                                    this.secondsToMinutes(this.state.setup.roundTime) 
+                                    this.secondsToMinutes(this.state.timeRemaining) 
                                 }
                             </strong></span>
                             <Button
