@@ -13,6 +13,8 @@ export class PlayGame extends Component {
         isCurrentlySaving: false,
         isUserReady: false,
         timeRemaining: 60,
+        period: 0,
+        createdBy: '',
         error: {
             state: false,
             msg: ''
@@ -20,7 +22,7 @@ export class PlayGame extends Component {
     }
 
     componentDidMount () {
-        const period = 0
+        const period = this.state.period
         const gameID = localStorage.getItem('gameID')
         const uri = 'games/' + gameID + '.json'
         axios.get(uri)
@@ -28,6 +30,7 @@ export class PlayGame extends Component {
                 const stateObj = {...this.state}
                 stateObj.inputs = res.data.inputs[period]
                 stateObj.setup = res.data.setup
+                stateObj.createdBy = res.data.createdBy
 
                 const now = new Date().getTime()
                 const passedTime = Math.round((now - Date.parse(res.data.createdInTime)) / 1000)
@@ -85,7 +88,7 @@ export class PlayGame extends Component {
         const inputs = {...this.state.inputs}
 
         const gameID = localStorage.getItem('gameID')
-        const period = 0
+        const period = this.state.period
         const uri = 'games/' + gameID + '/inputs/' + period + '.json'
 
         axios.put(uri, inputs)
@@ -166,6 +169,10 @@ export class PlayGame extends Component {
 
                 <Menu inverted>
                     <Menu.Item header>Venture Co</Menu.Item>
+                    <Menu.Menu position = 'right'>
+                        <Menu.Item header>Round: {this.state.period}</Menu.Item>
+                        <Menu.Item header>{this.state.createdBy}</Menu.Item>
+                    </Menu.Menu>
                 </Menu>
 
                 <Container>
