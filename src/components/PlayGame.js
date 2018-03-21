@@ -1,20 +1,20 @@
-import React, { Component } from "react";
+import React, { Component } from 'react'
 import { instance as axios } from '../axios'
-import { Slider } from "./Slider";
-import { Results } from "./Results";
-import { Button, Container, Loader, Dimmer, Header, Icon, Dropdown, Divider, Menu } from 'semantic-ui-react'
+import { Slider } from './Slider'
+import { Results } from './Results'
+import { FooterControls } from './FooterControls'
+import { Container, Loader, Dimmer, Header, Divider, Menu } from 'semantic-ui-react'
 
 export class PlayGame extends Component {
     state = {
         inputs: {},
-        setup: {},
         isLoadingFinished: false,
         isSaved: true,
         isCurrentlySaving: false,
         isUserReady: false,
         timeRemaining: 60,
-        period: 0,
-        createdBy: '',
+        period: 1,
+        historyPeriod: 0,
         error: {
             state: false,
             msg: ''
@@ -27,14 +27,16 @@ export class PlayGame extends Component {
         const uri = 'games/' + gameID + '.json'
         axios.get(uri)
             .then(res => {
+                this.setup = res.data.setup
+                this.setup.createdBy = res.data.createdBy
+
                 const stateObj = {...this.state}
                 stateObj.inputs = res.data.inputs[period]
-                stateObj.setup = res.data.setup
-                stateObj.createdBy = res.data.createdBy
+                
 
                 const now = new Date().getTime()
                 const passedTime = Math.round((now - Date.parse(res.data.createdInTime)) / 1000)
-                stateObj.timeRemaining = Math.max(res.data.setup.roundTime - passedTime, 0)
+                stateObj.timeRemaining = Math.max(this.setup.roundTime - passedTime, 0)
                 
                 stateObj.isLoadingFinished = true
                 this.setState(stateObj)
@@ -63,12 +65,6 @@ export class PlayGame extends Component {
         })
     }
 
-    secondsToMinutes = (time) => {
-        const minutes = Math.floor( time / 60 )
-        const seconds = time % 60
-        return minutes + ':' + seconds
-    }
-
     handleChange = ( event ) => {
         const name = event.target.name
         const updatedInputs = {...this.state.inputs}
@@ -78,6 +74,12 @@ export class PlayGame extends Component {
              inputs: updatedInputs,
              isSaved: false
         })
+    }
+
+    changeHistory = ( event ) => {
+        this.setState({
+            historyPeriod: Number(event.target.value)
+       })
     }
 
     saveInputs = () => {
@@ -110,59 +112,38 @@ export class PlayGame extends Component {
 
     toggleUserReady = () => {
         this.setState({
-            isUserReady: !this.state.isUserReady
+            isUserReady: !this.state.isUserReady,
         })
-    }
-
-    handleDismiss = () => {
-        return true
     }
 
     render() {
 
-        let Controls = 
-            <Dimmer active inverted>
-                <Loader content = 'Loading' size = 'huge'/>
-            </Dimmer>
+        if (!this.state.isLoadingFinished)
+            return (
+                <Dimmer active inverted>
+                    <Loader content = 'Loading' size = 'huge'/>
+                </Dimmer>
+            )
 
-        if (this.state.isLoadingFinished) {
+        const Controls = Object.keys(this.setup.inputs).map(key => {
 
-            Controls = Object.keys(this.state.setup.inputs).map(key => {
+            const inputSetup = {...this.setup.inputs[key]}
 
-                const inputSetup = {...this.state.setup.inputs[key]}
-
-                return (
-                    <Slider
-                        key = { key }
-                        type = { inputSetup.type }
-                        name = { key }
-                        realName = { inputSetup.realname }
-                        unit = { inputSetup.unit }
-                        min = { inputSetup.min }
-                        max = { inputSetup.max }
-                        step = { inputSetup.step }
-                        value = { this.state.inputs[key] }
-                        change = { this.handleChange }
-                    />
-                )
-            })        
-        }
-
-        const friendOptions = [
-            {
-                text: 'Target Year',
-                value: 'target'
-            },
-            {
-                text: 'History',
-                value: 'history'
-            },
-            {
-                text: 'Market Info',
-                value: 'market'
-            }
-                
-        ]
+            return (
+                <Slider
+                    key = { key }
+                    type = { inputSetup.type }
+                    name = { key }
+                    realName = { inputSetup.realname }
+                    unit = { inputSetup.unit }
+                    min = { inputSetup.min }
+                    max = { inputSetup.max }
+                    step = { inputSetup.step }
+                    value = { this.state.inputs[key] }
+                    change = { this.handleChange }
+                />
+            )
+        })
         
         return (
             <div className = 'PlayGame'> 
@@ -171,56 +152,68 @@ export class PlayGame extends Component {
                     <Menu.Item header>Venture Co</Menu.Item>
                     <Menu.Menu position = 'right'>
                         <Menu.Item header>Round: {this.state.period}</Menu.Item>
-                        <Menu.Item header>{this.state.createdBy}</Menu.Item>
+                        <Menu.Item header>{this.setup.createdBy}</Menu.Item>
                     </Menu.Menu>
                 </Menu>
 
                 <Container>
 
-                    <div className = 'spacer'>
+                    {/* <div className = 'spacer'>
                         <Header as = 'h2' content = 'P&L' />
-                        <Dropdown inline options={friendOptions} defaultValue={friendOptions[0].value} />
+                        <span><strong>Target Year</strong></span>
+                    </div> */}
+
+                    <div className = 'spacer'>
+                        <Header as = 'h2' content = 'History' />
+                        <span><strong>Round: {this.state.historyPeriod}</strong></span>
                     </div>
                     
-                    {this.state.isLoadingFinished ? 
-                        <Results
-                            inputs = {this.state.inputs}
-                            setup = { this.state.setup }
-                        /> 
-                        : null 
-                    }
+                    {/* {this.state.isLoadingFinished ?  */}
+                        <Results inputs = {this.state.inputs} /> 
+                        {/* : null 
+                    } */}
                     
                     <Divider />
 
-                    <Header as = 'h2' content = 'Make your moves!' />
-                    {Controls}
+                    {/* <Header as = 'h2' content = 'Make your moves!' />
+                    {Controls} */}
 
-                    <div className = 'fixed-bottom'>
-                        <div className = 'spacer'>
-                            <Button
-                                color = { this.state.isUserReady ? 'green' : 'blue' }
-                                onClick = { this.toggleUserReady }
-                                className = { this.state.isUserReady ? 'ready' : null }
-                            >
-                            { this.state.isUserReady ? 'Nicely done!' : "I'm ready" }
-                            </Button>
-                            <span><strong>
-                                { this.state.timeRemaining === 0 ? 
-                                    "Time's up!" : 
-                                    this.secondsToMinutes(this.state.timeRemaining) 
-                                }
-                            </strong></span>
-                            <Button
-                                loading = {this.state.isCurrentlySaving}
-                                color = { this.state.isSaved ? 'green' : 'blue' }
-                                onClick = { this.saveInputs }
-                                className = { this.state.isSaved ? 'saved' : null }
-                            >
-                            <Icon name = 'save' />
-                            { this.state.isSaved ? 'Saved' : 'Save' }
-                            </Button>
-                        </div>
+                    <div className = 'spacer'>Price
+                        <span>{ this.state.inputs.price.toLocaleString() } $</span>
                     </div>
+                    <div className = 'spacer'>Promotion
+                        <span>{ this.state.inputs.promotion.toLocaleString() } $</span>
+                    </div>
+                    <div className = 'spacer'>Quality
+                        <span>{ this.state.inputs.quality.toLocaleString() } %</span>
+                    </div>
+                    <div className = 'spacer'>Sales
+                        <span>{ this.state.inputs.sales.toLocaleString() } unit</span>
+                    </div>
+
+                    <Header as = 'h2' content = 'You can choose a round!' />
+
+                    <Slider
+                        type = 'range'
+                        name = 'round'
+                        realName = 'Round'
+                        unit = ''
+                        min = { 0 }
+                        max = { 5 }
+                        step = { 1 }
+                        value = { this.state.historyPeriod }
+                        change = { this.changeHistory }
+                    />
+
+
+                    <FooterControls 
+                        isUserReady = { this.state.isUserReady }
+                        toggleUserReady = { this.toggleUserReady }
+                        timeRemaining = { this.state.timeRemaining }
+                        isCurrentlySaving = { this.state.isCurrentlySaving }
+                        isSaved = { this.state.isSaved }
+                        saveInputs = { this.saveInputs }
+                    />
 
                 </Container>
             </div>

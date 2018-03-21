@@ -1,8 +1,10 @@
 ## Venture Co Project
 
+#Next steps
+Save to state all period input
+
 #Todo
 
-Remaining time based on game creation
 Next round
 History
 Market info
