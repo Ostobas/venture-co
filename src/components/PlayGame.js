@@ -22,7 +22,6 @@ export class PlayGame extends Component {
     }
 
     componentDidMount () {
-        const period = this.state.period
         const gameID = localStorage.getItem('gameID')
         const uri = 'games/' + gameID + '.json'
         axios.get(uri)
@@ -31,7 +30,7 @@ export class PlayGame extends Component {
                 this.setup.createdBy = res.data.createdBy
 
                 const stateObj = {...this.state}
-                stateObj.inputs = res.data.inputs[period]
+                stateObj.inputs = res.data.inputs
                 
 
                 const now = new Date().getTime()
@@ -66,9 +65,10 @@ export class PlayGame extends Component {
     }
 
     handleChange = ( event ) => {
+        const period = this.state.period
         const name = event.target.name
         const updatedInputs = {...this.state.inputs}
-        updatedInputs[name] = Number(event.target.value)
+        updatedInputs[period][name] = Number(event.target.value)
 
         this.setState({
              inputs: updatedInputs,
@@ -87,10 +87,11 @@ export class PlayGame extends Component {
             isCurrentlySaving: true
         })
 
-        const inputs = {...this.state.inputs}
+        
 
         const gameID = localStorage.getItem('gameID')
         const period = this.state.period
+        const inputs = {...this.state.inputs[period]}
         const uri = 'games/' + gameID + '/inputs/' + period + '.json'
 
         axios.put(uri, inputs)
@@ -111,8 +112,9 @@ export class PlayGame extends Component {
     }
 
     toggleUserReady = () => {
+        const period = Math.min(this.state.period + 1, this.setup.roundsTotal)
         this.setState({
-            isUserReady: !this.state.isUserReady,
+            period: period
         })
     }
 
@@ -139,7 +141,7 @@ export class PlayGame extends Component {
                     min = { inputSetup.min }
                     max = { inputSetup.max }
                     step = { inputSetup.step }
-                    value = { this.state.inputs[key] }
+                    value = { this.state.inputs[this.state.period][key] }
                     change = { this.handleChange }
                 />
             )
@@ -169,26 +171,29 @@ export class PlayGame extends Component {
                     </div>
                     
                     {/* {this.state.isLoadingFinished ?  */}
-                        <Results inputs = {this.state.inputs} /> 
+                        <Results inputs = {this.state.inputs[this.state.historyPeriod]} /> 
                         {/* : null 
                     } */}
                     
                     <Divider />
 
-                    {/* <Header as = 'h2' content = 'Make your moves!' />
-                    {Controls} */}
+                    <Header as = 'h2' content = 'Make your moves!' />
+                    {Controls}
 
                     <div className = 'spacer'>Price
-                        <span>{ this.state.inputs.price.toLocaleString() } $</span>
+                        <span>{ this.state.inputs[this.state.historyPeriod].price.toLocaleString() } $</span>
                     </div>
                     <div className = 'spacer'>Promotion
-                        <span>{ this.state.inputs.promotion.toLocaleString() } $</span>
+                        <span>{ this.state.inputs[this.state.historyPeriod].promotion.toLocaleString() } $</span>
                     </div>
                     <div className = 'spacer'>Quality
-                        <span>{ this.state.inputs.quality.toLocaleString() } %</span>
+                        <span>{ this.state.inputs[this.state.historyPeriod].quality.toLocaleString() } %</span>
                     </div>
-                    <div className = 'spacer'>Sales
-                        <span>{ this.state.inputs.sales.toLocaleString() } unit</span>
+                    <div className = 'spacer'>Sales Estimation
+                        <span>{ this.state.inputs[this.state.historyPeriod].sales.toLocaleString() } unit</span>
+                    </div>
+                    <div className = 'spacer'>Actual Sales
+                        <span>{ this.state.inputs[this.state.historyPeriod].sales.toLocaleString() } unit</span>
                     </div>
 
                     <Header as = 'h2' content = 'You can choose a round!' />
@@ -199,7 +204,7 @@ export class PlayGame extends Component {
                         realName = 'Round'
                         unit = ''
                         min = { 0 }
-                        max = { 5 }
+                        max = { this.state.period - 1 }
                         step = { 1 }
                         value = { this.state.historyPeriod }
                         change = { this.changeHistory }

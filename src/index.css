@@ -16,6 +16,7 @@
   left: 0;
   right: 0;
   padding: 1em;
+  background-color: #fff;
   border-top: 1px solid rgba(34,36,38,.15);
 }
 
@@ -26,4 +27,9 @@
 
 .ui.menu {
   border-radius: 0;
+}
+
+.App {
+  height: calc(100vh - 70px);
+  overflow: auto;
 }

@@ -41,7 +41,7 @@ export class CreateGame extends Component {
         gameObj.setup.demands = []
         gameObj.inputs = []
         for ( let i = 0; i <= gameObj.setup.roundsTotal; i++ ) {
-            gameObj.setup.demands.push( gameObj.setup.baseDemand *  gameObj.setup.teamsTotal )
+            gameObj.setup.demands.push( gameObj.setup.baseDemand * gameObj.setup.teamsTotal )
             gameObj.inputs.push( gameObj.defaultInputs )
         }
 
