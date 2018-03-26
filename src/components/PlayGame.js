@@ -3,7 +3,8 @@ import { instance as axios } from '../axios'
 import { Slider } from './Slider'
 import { Results } from './Results'
 import { FooterControls } from './FooterControls'
-import { Container, Loader, Dimmer, Header, Divider, Menu } from 'semantic-ui-react'
+import { Container, Loader, Dimmer, Header, Divider, Menu, Button } from 'semantic-ui-react'
+import { marketModel } from './marketModel';
 
 export class PlayGame extends Component {
     state = {
@@ -15,6 +16,7 @@ export class PlayGame extends Component {
         timeRemaining: 60,
         period: 1,
         historyPeriod: 0,
+        view: 'target',
         error: {
             state: false,
             msg: ''
@@ -111,11 +113,27 @@ export class PlayGame extends Component {
         })
     }
 
-    toggleUserReady = () => {
+    nextRound = () => {
+
+        const p = marketModel.getSales(this.state.inputs[this.state.period])
+        console.log(p)
+
         const period = Math.min(this.state.period + 1, this.setup.roundsTotal)
         this.setState({
             period: period
         })
+    }
+
+    toggleView = () => {
+        if (this.state.view === 'target') {
+            this.setState({
+                view: 'history'
+            })
+        } else {
+            this.setState({
+                view: 'target'
+            })
+        }
     }
 
     render() {
@@ -160,60 +178,70 @@ export class PlayGame extends Component {
 
                 <Container>
 
-                    {/* <div className = 'spacer'>
-                        <Header as = 'h2' content = 'P&L' />
-                        <span><strong>Target Year</strong></span>
-                    </div> */}
-
                     <div className = 'spacer'>
-                        <Header as = 'h2' content = 'History' />
-                        <span><strong>Round: {this.state.historyPeriod}</strong></span>
+                        <Header as = 'h2' 
+                            content = { this.state.view === 'target' ? 'P&L' : 'History' } />
+                        <span><strong>
+                            { this.state.view === 'target' ? 
+                            'Target Year' : (
+                                'Round: ' + this.state.historyPeriod
+                            )}
+                        </strong></span>
                     </div>
                     
-                    {/* {this.state.isLoadingFinished ?  */}
-                        <Results inputs = {this.state.inputs[this.state.historyPeriod]} /> 
-                        {/* : null 
-                    } */}
+                    {this.state.view === 'target' ? 
+                        <Results inputs = {this.state.inputs[this.state.period]} /> :
+                        <Results inputs = {this.state.inputs[this.state.historyPeriod]} />
+                    }
                     
                     <Divider />
 
-                    <Header as = 'h2' content = 'Make your moves!' />
-                    {Controls}
+                    
+                    {this.state.view === 'target' ? 
+                    (
+                        <Header as = 'h2' content = 'Make your moves!' />
+                        , Controls
+                    ) :
+                    (<div>
+                        <div className = 'spacer'>Price
+                            <span>{ this.state.inputs[this.state.historyPeriod].price.toLocaleString() } $</span>
+                        </div>
+                        <div className = 'spacer'>Promotion
+                            <span>{ this.state.inputs[this.state.historyPeriod].promotion.toLocaleString() } $</span>
+                        </div>
+                        <div className = 'spacer'>Quality
+                            <span>{ this.state.inputs[this.state.historyPeriod].quality.toLocaleString() } %</span>
+                        </div>
+                        <div className = 'spacer'>Sales Estimation
+                            <span>{ this.state.inputs[this.state.historyPeriod].sales.toLocaleString() } unit</span>
+                        </div>
+                        <div className = 'spacer'>Actual Sales
+                            <span>{ this.state.inputs[this.state.historyPeriod].sales.toLocaleString() } unit</span>
+                        </div>
+    
+                        <Header as = 'h2' content = 'You can choose a round!' />
+    
+                        <Slider
+                            type = 'range'
+                            name = 'round'
+                            realName = 'Round'
+                            unit = ''
+                            min = { 0 }
+                            max = { this.state.period - 1 }
+                            step = { 1 }
+                            value = { this.state.historyPeriod }
+                            change = { this.changeHistory }
+                        />
+                        </div>
+                    )}
 
-                    <div className = 'spacer'>Price
-                        <span>{ this.state.inputs[this.state.historyPeriod].price.toLocaleString() } $</span>
-                    </div>
-                    <div className = 'spacer'>Promotion
-                        <span>{ this.state.inputs[this.state.historyPeriod].promotion.toLocaleString() } $</span>
-                    </div>
-                    <div className = 'spacer'>Quality
-                        <span>{ this.state.inputs[this.state.historyPeriod].quality.toLocaleString() } %</span>
-                    </div>
-                    <div className = 'spacer'>Sales Estimation
-                        <span>{ this.state.inputs[this.state.historyPeriod].sales.toLocaleString() } unit</span>
-                    </div>
-                    <div className = 'spacer'>Actual Sales
-                        <span>{ this.state.inputs[this.state.historyPeriod].sales.toLocaleString() } unit</span>
-                    </div>
-
-                    <Header as = 'h2' content = 'You can choose a round!' />
-
-                    <Slider
-                        type = 'range'
-                        name = 'round'
-                        realName = 'Round'
-                        unit = ''
-                        min = { 0 }
-                        max = { this.state.period - 1 }
-                        step = { 1 }
-                        value = { this.state.historyPeriod }
-                        change = { this.changeHistory }
-                    />
-
+                    <Button primary onClick = { this.toggleView }>
+                    Change View
+                    </Button>
 
                     <FooterControls 
                         isUserReady = { this.state.isUserReady }
-                        toggleUserReady = { this.toggleUserReady }
+                        nextRound = { this.nextRound }
                         timeRemaining = { this.state.timeRemaining }
                         isCurrentlySaving = { this.state.isCurrentlySaving }
                         isSaved = { this.state.isSaved }

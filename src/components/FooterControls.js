@@ -15,7 +15,7 @@ export const FooterControls = props => {
             <div className = 'spacer'>
                 <Button
                     color = { props.isUserReady ? 'green' : 'blue' }
-                    onClick = { props.toggleUserReady }
+                    onClick = { props.nextRound }
                     className = { props.isUserReady ? 'ready' : null }
                 >
                 { props.isUserReady ? 'Nicely done!' : "Next round!" }
