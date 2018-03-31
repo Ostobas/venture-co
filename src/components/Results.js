@@ -5,7 +5,7 @@ export const Results = props => {
     const price = props.inputs.price
     const promotion = props.inputs.promotion
     const quality = props.inputs.quality
-    const sales = props.inputs.sales
+    const sales = props.results ? props.results.sales : props.inputs.sales
 
     const getRevenue = () => ( price * sales )
 

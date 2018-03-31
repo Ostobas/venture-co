@@ -9,12 +9,13 @@ import { marketModel } from './marketModel';
 export class PlayGame extends Component {
     state = {
         inputs: {},
+        results: {},
         isLoadingFinished: false,
         isSaved: true,
         isCurrentlySaving: false,
         isUserReady: false,
         timeRemaining: 60,
-        period: 1,
+        period: 0,
         historyPeriod: 0,
         view: 'target',
         error: {
@@ -22,6 +23,8 @@ export class PlayGame extends Component {
             msg: ''
         }
     }
+
+    setup = {}
 
     componentDidMount () {
         const gameID = localStorage.getItem('gameID')
@@ -33,7 +36,8 @@ export class PlayGame extends Component {
 
                 const stateObj = {...this.state}
                 stateObj.inputs = res.data.inputs
-                
+                stateObj.results = res.data.results
+                stateObj.period = res.data.currentPeriod
 
                 const now = new Date().getTime()
                 const passedTime = Math.round((now - Date.parse(res.data.createdInTime)) / 1000)
@@ -119,23 +123,42 @@ export class PlayGame extends Component {
             isLoadingFinished: false
         })
 
-        this.getInputs().then(resolve => {
-            console.log('[Inputs]',resolve)
-            return marketModel.getSales(resolve.inputs, resolve.demand)
-        })
+        this.fetchInputs()
+        .then(resolve => 
+            marketModel.getSales(resolve.inputs, resolve.demand)
+        )
         .then(sales => {
-            console.log('[Sales]',sales)
-            period = Math.min(period + 1, this.setup.roundsTotal)
-            this.setState({
-                isLoadingFinished: true,
-                view: 'history',
-                period: period,
-                historyPeriod: period - 1
+            
+            //Current period +1 in DB
+
+            const gameID = localStorage.getItem('gameID')
+            const uri = 'games/' + gameID + '/results/' + period +'.json'
+            const results = {
+                sales: sales[0]
+            }
+
+            axios.put(uri, results)
+            .then(res => {
+                period = Math.min(period + 1, this.setup.roundsTotal)
+                this.setState({
+                    isLoadingFinished: true,
+                    view: 'history',
+                    period: period,
+                    historyPeriod: period - 1
+                })
+            })
+            .catch(err => {
+                this.setState({
+                    error: {
+                        state: true,
+                        msg: err
+                    }
+                })
             })
         })
     }
 
-    getInputs = () => new Promise ((resolve, reject) => {
+    fetchInputs = () => new Promise ((resolve, reject) => {
 
         const period = this.state.period
         const gameID = localStorage.getItem('gameID')
@@ -239,9 +262,16 @@ export class PlayGame extends Component {
                         </strong></span>
                     </div>
                     
-                    {this.state.view === 'target' ? 
-                        <Results inputs = {this.state.inputs[this.state.period]} /> :
-                        <Results inputs = {this.state.inputs[this.state.historyPeriod]} />
+                    {this.state.view === 'target' ? (
+                        <Results 
+                            inputs = {this.state.inputs[this.state.period]} 
+                        /> 
+                    ): (
+                        <Results
+                            inputs = {this.state.inputs[this.state.historyPeriod]}
+                            results = {this.state.results[this.state.historyPeriod]}
+                        />
+                    )
                     }
                     
                     <Divider />
@@ -266,7 +296,7 @@ export class PlayGame extends Component {
                             <span>{ this.state.inputs[this.state.historyPeriod].sales.toLocaleString() } unit</span>
                         </div>
                         <div className = 'spacer'>Actual Sales
-                            <span>{ this.state.inputs[this.state.historyPeriod].sales.toLocaleString() } unit</span>
+                            <span>{ this.state.results[this.state.historyPeriod].sales.toLocaleString() } unit</span>
                         </div>
     
                         <Header as = 'h2' content = 'You can choose a round!' />
