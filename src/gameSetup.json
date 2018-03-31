@@ -40,6 +40,24 @@
           "unit" : "unit"
         }
       },
+      "marketModel" : {
+        "price" : {
+          "max" : 250,
+          "min" : 25,
+          "alfa" : 2
+        },
+        "promotion" : {
+          "mean" : 350000
+        },
+        "weights" : {
+          "price" : 40,
+          "promotion" : 30,
+          "quality" : 30
+        },
+        "market" : {
+          "elasticity" : 2.25
+        }
+      },
       "baseDemand" : 20000
     }
   }

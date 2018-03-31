@@ -89,8 +89,6 @@ export class PlayGame extends Component {
             isCurrentlySaving: true
         })
 
-        
-
         const gameID = localStorage.getItem('gameID')
         const period = this.state.period
         const inputs = {...this.state.inputs[period]}
@@ -115,14 +113,66 @@ export class PlayGame extends Component {
 
     nextRound = () => {
 
-        const p = marketModel.getSales(this.state.inputs[this.state.period])
-        console.log(p)
+        let period = this.state.period
 
-        const period = Math.min(this.state.period + 1, this.setup.roundsTotal)
         this.setState({
-            period: period
+            isLoadingFinished: false
+        })
+
+        this.getInputs().then(resolve => {
+            console.log('[Inputs]',resolve)
+            return marketModel.getSales(resolve.inputs, resolve.demand)
+        })
+        .then(sales => {
+            console.log('[Sales]',sales)
+            period = Math.min(period + 1, this.setup.roundsTotal)
+            this.setState({
+                isLoadingFinished: true,
+                view: 'history',
+                period: period,
+                historyPeriod: period - 1
+            })
         })
     }
+
+    getInputs = () => new Promise ((resolve, reject) => {
+
+        const period = this.state.period
+        const gameID = localStorage.getItem('gameID')
+        const uri = 'games/' + gameID + '.json'
+        axios.get(uri)
+            .then(res => {
+                const playerInputs = res.data.inputs[period]
+                const defaultInputs = res.data.defaultInputs
+                const teamsTotal = res.data.setup.teamsTotal
+                const demand = res.data.setup.demands[period]
+                let inputs = {
+                    price: [], promotion: [], quality: []
+                }
+
+                for (let i = 0; i < teamsTotal; i++) {
+                    for (const inputType in inputs) {
+                        if (i === 0)
+                            inputs[inputType].push(playerInputs[inputType])
+                        else 
+                            inputs[inputType].push(defaultInputs[inputType])
+                    }
+                }
+
+                resolve({
+                    inputs: inputs,
+                    demand: demand
+                })
+            })
+            .catch(err => {
+                this.setState({
+                    error: {
+                        state: true,
+                        msg: err
+                    }
+                })
+            })
+    })
 
     toggleView = () => {
         if (this.state.view === 'target') {
