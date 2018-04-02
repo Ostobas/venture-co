@@ -38,7 +38,10 @@ export class CreateGame extends Component {
         gameObj.createdInTime = new Date()
         gameObj.code = this.generateCode(6)
         gameObj.currentPeriod = 1
-        gameObj.results[0] = gameObj.setup.baseDemand
+        gameObj.results = []
+        gameObj.results[0] = {
+            sales: gameObj.setup.baseDemand
+        }
 
         gameObj.setup.demands = []
         gameObj.inputs = []

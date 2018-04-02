@@ -128,24 +128,28 @@ export class PlayGame extends Component {
             marketModel.getSales(resolve.inputs, resolve.demand)
         )
         .then(sales => {
-            
-            //Current period +1 in DB
 
             const gameID = localStorage.getItem('gameID')
-            const uri = 'games/' + gameID + '/results/' + period +'.json'
-            const results = {
+            let uri = 'games/' + gameID + '/results/' + period + '.json'
+            let results = [...this.state.results]
+            results[period] = {
                 sales: sales[0]
             }
 
-            axios.put(uri, results)
+            axios.put(uri, results[period])
             .then(res => {
                 period = Math.min(period + 1, this.setup.roundsTotal)
                 this.setState({
                     isLoadingFinished: true,
                     view: 'history',
                     period: period,
-                    historyPeriod: period - 1
+                    historyPeriod: period - 1,
+                    results: results
                 })
+            })
+            .then(() => {
+                uri = 'games/' + gameID + '/currentPeriod.json'
+                axios.put(uri,  period)
             })
             .catch(err => {
                 this.setState({
@@ -155,6 +159,7 @@ export class PlayGame extends Component {
                     }
                 })
             })
+
         })
     }
 
